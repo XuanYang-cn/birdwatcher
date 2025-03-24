@@ -95,12 +95,24 @@ func (c *ComponentShow) SegmentCommand(ctx context.Context, p *SegmentParam) err
 				dropped++
 			}
 
+			deltaEntryNum := int64(0)
+			for _, delta := range info.GetDeltalogs() {
+				for _, log := range delta.Binlogs {
+					deltaEntryNum += log.EntriesNum
+				}
+			}
+
+			deltaPerc := 0.0
+			if info.NumOfRows > 0 {
+				deltaPerc = float64(deltaEntryNum) / float64(info.NumOfRows)
+			}
+
 			switch p.Format {
 			case "table":
 				PrintSegmentInfo(info, p.Detail)
 			case "line":
-				fmt.Printf("SegmentID: %d PartitionID: %d State: %s, Level: %s, Row Count:%d,  PartitionStatsVersion:%d, IsSorted: %v \n",
-					info.ID, info.PartitionID, info.State.String(), info.Level.String(), info.NumOfRows, info.PartitionStatsVersion, info.IsSorted)
+				fmt.Printf("SegmentID: %d PartitionID: %d State: %s, Level: %s, Row Count:%d, Delta Entries Num: %d, Delete Percent: %f, PartitionStatsVersion:%d, IsSorted: %v \n",
+					info.ID, info.PartitionID, info.State.String(), info.Level.String(), info.NumOfRows, deltaEntryNum, deltaPerc, info.PartitionStatsVersion, info.IsSorted)
 			case "statistics":
 				if info.State != models.SegmentStateDropped {
 					for _, binlog := range info.GetBinlogs() {
