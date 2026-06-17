@@ -25,7 +25,8 @@ const (
 	SegmentBM25LogPrefix   = "bm25log"
 	DCSnapshotPrefix       = "snapshot"
 
-	CompactionTaskPrefix = `compaction-task`
+	CompactionTaskPrefix   = `compaction-task`
+	CompactionTargetPrefix = `compaction-target`
 )
 
 const (
